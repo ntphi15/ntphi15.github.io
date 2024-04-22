@@ -24,7 +24,6 @@
 
   <!-- Template Main CSS File -->
   <link href="../assets/css/style.css" rel="stylesheet">
-
 </head>
 
 <body>        
@@ -61,18 +60,197 @@
                     <li>Which customers need nurturing and retention efforts before they become churned customers?</li>
                 </ul>                  
                 <p>Segmenting customers based on RFM can help evaluate customers from various perspectives and factors. Simultaneously, it aids in crafting tailored messages, campaigns and incentive programs for each customer group based on their consumption behavior with the goal of driving future revenue growth. Therefore, marketing activities based on this approach have the potential to increase response rates and enhance customer retention, satisfaction and overall value.</p>
-
-                <h4>About "BCG Matrix"</h4>
-                <p>The Boston Consulting Group (BCG) Growth-Share Matrix, also known as the product portfolio matrix, is a strategic planning tool used by businesses to evaluate the position of their brand portfolio. It helps companies make decisions about whether to retain, divest, or invest more in specific products or business units. Let’s break it down:</p>         
-                <ul>                    
-                    <li><b>Dogs (or Pets):</b> These are products with low market share and slow growth. They don’t generate significant cash flow for the company. Dogs can become cash traps, tying up resources without much return. Companies often consider selling, liquidating, or repositioning these products.</li>
-                    <li><b>Cash Cows:</b> These products have large market share but are in low-growth areas. Cash cows are typically mature market leaders that generate returns higher than the market’s growth rate. Companies should capitalize on them for as long as possible.</li>
-                    <li><b>Stars:</b> These products operate in high-growth markets and hold a substantial market share. Companies should invest in stars because of their potential for future growth.</li>
-                    <li><b>Question Marks:</b> These products are in high-growth markets but have low market share. They are uncertain—hence the name. Companies must decide whether to invest more in them to turn them into stars or let them decline.</li>
-                </ul>                    
-                <p>Remember, the BCG matrix helps prioritize business activities and guide strategic decisions. However, it doesn’t account for new disruptive products or rapid shifts in consumer demand.</p>
             </div>    
             
+            <div class="resume-item">
+                <h3 class="resume-title">Data Information</h3>
+                <h4>Raw data description</h4>
+                <p><b>"customer_registered"</b> table contains customer registration information including 4.356.167 rows and 7 columns:</p>
+                <ul>
+                    <li><b>"ID":</b> The customer's member registration ID is a number from 0 to 4.356.166;</li>
+                    <li><b>"Contract":</b> The contract name consists of 9 characters, including letters and numbers;</li>
+                    <li><b>"LocationID":</b> The store address ID where the customer register in a real number format;</li>
+                    <li><b>"BranchCode":</b> The branch code where the customer register in a real number format;</li>
+                    <li><b>"created_date":</b> The day that customer register for membership in <i>"YYYY/MM/DD hh:mm:ss.ffffff"</i> format;</li>
+                    <li><b>"stopdate":</b> The day that customer cancel for membership in <i>"YYYY/MM/DD hh:mm:ss.fff"</i> format.</li>
+                </ul>
+                <p><b>"customer_transaction"</b> table contains customer transaction information including 1.048.575 rows and 4 columns:</p>
+                <ul>
+                    <li><b>"ID":</b> The customer's transaction ID is a number from 0 to 1.048.574;</li>
+                    <li><b>"CustomerID":</b> The customer's member registration ID in an integer number format;</li>
+                    <li><b>"Purchase_Date":</b> The day that customer buy goods in <i>"YYYY/MM/DD"</i> format;</li>
+                    <li><b>"GMV":</b> The total value of all goods sold in an integer number format.</li>
+                </ul>                
+                <p><b>"location"</b> table contains branch information including 116 rows and 6 columns:</p>
+                <ul>
+                    <li><b>"ID":</b> The customer's transaction ID is a number from 0 to 1.048.574;</li>
+                    <li><b>"SubCompanyID":</b> The subsidiary company area ID in an integer number format;</li>
+                    <li><b>"SubCompanyName":</b> The subsidiary company area name in a string format;</li>
+                    <li><b>"LocationID":</b> The store address ID in an integer number format;</li>
+                    <li><b>"BranchCode":</b> The branch code in an integer number format;</li>
+                    <li><b>"LocationName":</b> The store address name in a string format.</li>
+                </ul>
+
+                <h4>Clean data with Python</h4>
+                <p>In <b>"customer_registered"</b> table:</p>
+                <ul>
+                    <li>Read <b>"customer_registered"</b> table from <b>"customer_registered.csv"</b> file;</li>
+                    <li>Convert <b>"created_date"</b> column to Date type by using the Pandas Python module;</li>
+                    <li>Convert <b>"stopdate"</b> column to Date type by using the Pandas Python module;</li>
+                    <li>Export <b>"customer_registered.csv"</b> file after cleaning.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i># Read "customer_registered" table from "customer_registered.csv" file;</i>
+                        <br>import pandas as pd
+                        <br>customer_registered = pd.read_csv("C:\\Users\\Admin\\OneDrive - VNU-HCMUS\Data Analytics\\1. Customer Segmentation by RFM Model\\0. Raw Data\\customer_registered.csv")
+                        <br>
+                        <br><i># Convert "created_date" column to Date type by using the Pandas Python module;</i>
+                        <br>customer_registered['created_date'] = pd.to_datetime(customer_registered['created_date']).dt.date
+                        <br>customer_registered['created_date'] = pd.to_datetime(customer_registered['created_date'])
+                        <br>
+                        <br><i># Convert "stopdate" column to Date type by using the Pandas Python module;</i>
+                        <br>customer_registered['stopdate'] = pd.to_datetime(customer_registered['stopdate']).dt.date
+                        <br>customer_registered['stopdate'] = pd.to_datetime(customer_registered['stopdate'])
+                        <br>
+                        <br><i># Export "customer_registered.csv" file after cleaning.</i>
+                        <br>customer_registered.to_csv("../1. Clean Data/customer_registered.csv", index=False)
+                    </p>
+                </div>
+                <p>In <b>"customer_transaction"</b> table:</p>
+                <ul>
+                    <li>Read <b>"customer_transaction"</b> table from <b>"customer_transaction.csv"</b> file;</li>
+                    <li>Convert <b>"Purchase_Date"</b> column to Date type by using the Pandas Python module;</li>
+                    <li>Export <b>"customer_transaction.csv"</b> file after cleaning.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i># Read "customer_transaction" table from "customer_transaction.csv" file;</i>
+                        <br>customer_transaction = pd.read_csv("C:\\Users\\Admin\\OneDrive - VNU-HCMUS\Data Analytics\\1. Customer Segmentation by RFM Model\\0. Raw Data\\customer_transaction.csv")
+                        <br>
+                        <br><i># Convert "Purchase_Date" column to Date type by using the Pandas Python module;</i>
+                        <br>customer_transaction['Purchase_Date'] = pd.to_datetime(customer_transaction['Purchase_Date'])
+                        <br>
+                        <br><i># Export "customer_transaction.csv" file after cleaning.</i>
+                        <br>customer_transaction.to_csv("../1. Clean Data/customer_transaction.csv", index=False)
+                    </p>
+                </div>
+                <p>In <b>"location"</b> table:</p>
+                <ul>
+                    <li>Read <b>"location"</b> table from <b>"customer_transaction.csv"</b> file;</li>
+                    <li>Convert <b>"LocationID"</b> column to float type by using the Pandas Python module;</li>
+                    <li>Convert <b>"BranchCode"</b> column to float type by using the Pandas Python module;</li>
+                    <li>Export <b>"location.csv"</b> file after cleaning.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i># Read "location" table from "customer_transaction.csv" file;</i>
+                        <br>location = pd.read_csv("C:\\Users\\Admin\\OneDrive - VNU-HCMUS\\Data Analytics\\1. Customer Segmentation by RFM Model\\0. Raw Data\\location.csv")
+                        <br>
+                        <br><i># Convert "LocationID" column to float type by using the Pandas Python module;</i>
+                        <br>location['LocationID'] = location['LocationID'].astype(float)
+                        <br>
+                        <br><i># Convert "BranchCode" column to float type by using the Pandas Python module;</i>
+                        <br>location['BranchCode'] = location['BranchCode'].astype(float)
+                        <br>
+                        <br><i># Export "location.csv" file after cleaning.</i>
+                        <br>location.to_csv("../1. Clean Data/location.csv", index=False)
+                    </p>
+                </div>
+            </div>
+
+            <div class="resume-item">
+                <h3 class="resume-title">Data Analytics</h3>
+                <h4>RFM score calculated with SQL</h4>
+                <p>First of all, we need to calculate per customer how many days have passed since the last order (Recency), how many orders they have placed (Frequency), and the monetary value they generated (Monetary Value). To conduct RFM analysis, let’s see how we can score these customers by ranking them based on each RFM factor separately. Let’s begin with ranking customers on recency first and score all customers from 1-4.</p>
+                <p>We have sorted customers by recency, with the most recent purchasers at the top. Once the numbers are sorted, you will separate your customer data into quartiles, 4 equal groups of 25%. The top 25% of customers receive a recency score of 1, the next 25% a score of 2, and so on. Similarly, we can then sort customers by frequency from most to least frequent, assigning the top 25% a frequency score of 1, etc. For the monetary value, the top 25% of customers will be assigned a score of 1 and the lowest 25% a score of 4.</p>
+                <p>After we have sorted and assigned scores to each factor, you will be able to determine each customer's RFM score by combining each individual score. There are up to 64 different combinations of RFM scores. The report shows how many customers are assigned to each score combination and we provide the following predefined RFM statuses:</p>
+                <ul>
+                    <li><b>Top Customers</b> (RFM score <i>"111"</i>): Most valuable customers:  made the highest amount of purchases, with the least days since last order and the highest monetary value;</li>
+                    <li><b>Loyal Customers</b> (RFM score <i>"x1x"</i>): Customers that made a great number of purchases. This segment does not indicate performance regarding days since the last order or monetary value;</li>
+                    <li><b>High Potentials</b> (RFM score <i>"xx1"</i>): Customers that made had a great AOV along their lifecycle. This segment does not indicate performance regarding days since the last order or number of orders in their lifecycle;</li>
+                    <li><b>Small Buyers</b> (RFM score <i>"x13"</i> or <i>"x14"</i>): Customers that place few orders will have a small monetary value. This segment does not indicate performance regarding days since the last order;</li>
+                    <li><b>Dormant Customers</b> (RFM score <i>"44x"</i>): Customers that placed few orders a long time ago. This segment does not indicate performance regarding the monetary value of those orders;</li>
+                    <li><b>Worst Customers</b> (RFM score <i>"444"</i>): Customers that placed few orders, a long time ago, with small monetary value.</li>
+                </ul>
+                <p>Customers who do not fall under the specifications above will be categorized as <b>Other</b>. All customers are assigned an RFM score; however, not all scores have a predefined RFM status.</p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        select CustomerID, R, F, M, concat(R, F, M) as RFM,
+                        <br>&nbsp;&nbsp;&nbsp;(case when R = 1 and F = 1 and M = 1 then "Top customer"
+                        <br>&nbsp;&nbsp;&nbsp;when (F = 1 and M = 1) or (F = 1 and M = 2) then "Loyal customer"
+	                    <br>&nbsp;&nbsp;&nbsp;when M = 1 then "High potential"
+                        <br>&nbsp;&nbsp;&nbsp;when (F = 1 and M = 3) or (F = 1 and M = 4) then "Small buyer"
+                        <br>&nbsp;&nbsp;&nbsp;when R = 4 and F = 4 and M = 4 then "Worst customer"
+                        <br>&nbsp;&nbsp;&nbsp;when R = 4 and F = 4 then "Dormant customer" else "Other" end) as Category
+                        <br>from (select CustomerID, ntile(4) over (partition by Recency) as R,
+	                    <br>&nbsp;&nbsp;&nbsp;ntile(4) over (order by Frequency desc) as F,
+	                    <br>&nbsp;&nbsp;&nbsp;ntile(4) over (order by Monetary desc) as M
+	                    <br>&nbsp;&nbsp;&nbsp;from (select distinct(ct.CustomerID), datediff('2022-09-01', max(ct.Purchase_Date)) as Recency,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count(distinct(ct.Purchase_Date)) / (datediff('2022-09-01', cr.created_date)/365) as Frequency,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sum(ct.GMV)	as Monetary
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from customer_transaction ct
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left join customer_registered cr on ct.CustomerID = cr.ID 
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where cr.stopdate is null
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;group by CustomerID) A) B
+                    </p>
+                </div>
+                
+                <h4>Customer segmentation analysis</h4>
+                <p>There are 4.356.168 customers registered from March 1, 2009 to September 8, 2022, including 3.307.832 customers currently using the service and 1.048.336 customers who have discontinued using it. The revenue achieved in the 2 months from June 1, 2022 to August 31, 2022 is over 82 billion VND with 1.048.575 transactions. The company has a total of 116 branches, spanning across 7 areas and 59 provinces.</p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/1.png" alt="Customer registered by location" width="75%">
+                        <br><i>Chart 1. Customer registered by location</i>
+                    </center>
+                </p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/2.png" alt="Customer registered and transaction by subsidiary company area" width="50%">
+                        <br><i>Chart 2. Customer registered and transaction by subsidiary company area</i>
+                    </center>
+                </p>
+                <p>In general, there is a relatively even distribution and no significant disparity among customer groups based on specific criteria. Besides, the customer volume in Da Nang has a less regular purchase frequency compared to other provinces, and this customer volume accounts for only 1/5 of the total.</p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/3.png" alt="RFM rate of top 10 locations" width="100%">
+                        <br><i>Chart 3. RFM rate of top 10 locations</i>
+                    </center>
+                </p>
+                <p>Despite being ranked fourth in terms of total customer volume, group 111 generates the highest revenue. This is the most valuable customers, company should concentrate on this group in order to increase this group revenue. Simultaneously, group 343, which has the largest number of customers, ranks third in revenue after group 411. The group 343 do not have any specifications while the customer of group 411 brings a great number of purchases. </p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/4.png" alt="Number customer and GMV of top 10 RFM score" width="100%">
+                        <br><i>Chart 4. Number customer and GMV of top 10 RFM score</i>
+                    </center>
+                </p>
+                <p>According to RFM statuses, we divide customer into 7 groups. The majority of the "Other" customer group accounts for more than half of the total current customer base. There are 97,566 "High potential" customers, representing 15.69%. Next in line are "Small buyers", making up 12.35%. The remaining groups all fall below 10%, with "Top customer" positioned near the bottom ahead of "Worst customer".</p>
+                <p>The revenue from the "Other" customer group accounts for nearly one-third of the total company revenue. Despite "Loyal customer" group ranking third, the revenue generated from this group actually holds the second position, trailing behind the "High potential" group. The revenue generated by "Worst customer" group is at its lowest, while the number of customers in this group also occupies the least position compared to the total customer count.</p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/5.png" alt="Customer categorized and GMV by RFM score" width="50%">
+                        <br><i>Chart 5. Customer categorized and GMV by RFM score</i>
+                    </center>
+                </p>
+                <p>The 1st and 5th area are the two highest revenue-generating areas, primarily because they contain the two largest cities in the country, namely Ho Chi Minh City and Hanoi. Additionally, south provinces, which fall under 6th area, have numerous industrial zones and a high demand for shopping, resulting in this region’s third-place revenue position. The demand for shopping by residents in the western provinces and north-eastern provinces is not high;Therefore, the revenue from these regions is not high either.</p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/6.png" alt="The revenue of customer categorized by area" width="75%">
+                        <br><i>Chart 6. The revenue of customer categorized by area</i>
+                    </center>
+                </p>
+                <p>Hanoi and Ho Chi Minh City are always the two regions with the highest number of customers across various groups. Ho Chi Minh City leads in terms of "High potential" customers, but it also tops the list for "Worst customer". In this case, Hanoi is the city that leads in terms of the number of "Top customer". In addition, Dong Nai and Binh Duong provinces, which have a significant population and numerous factories, always come after the two major cities.</p>
+                <p>
+                    <center>
+                        <img src="../assets/img/customer_segmentation_by_rfm_model/7.png" alt="Top 10 'high potential', 'top customer' and 'worst customer' location" width="100%">
+                        <br><i>Chart 7. Top 10 "high potential", "top customer" and "worst customer" location</i>
+                    </center>
+                </p>
+            </div>
+
+            <div class="resume-item">
+                <h3 class="resume-title">Conclusion</h3>
+            </div>
         </div>        
                
     </section><!-- End About Section -->        

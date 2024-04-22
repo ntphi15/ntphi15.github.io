@@ -451,6 +451,17 @@ section {
   margin-bottom: 10px;
 }
 
+.about ul {
+  margin-top: -10px;
+}
+
+.about .code{
+  background: whitesmoke;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: smaller;
+  margin-left: 15px;
+}
+
 /*--------------------------------------------------------------
 # Facts
 --------------------------------------------------------------*/
