@@ -101,15 +101,15 @@
                 </ul>
                 <div class="code">
                     <p>
-                        <i># Read "customer_registered" table from "customer_registered.csv" file;</i>
+                        <i><b># Read "customer_registered" table from "customer_registered.csv" file;</b></i>
                         <br>import pandas as pd
                         <br>customer_registered = pd.read_csv("C:\\Users\\Admin\\OneDrive - VNU-HCMUS\Data Analytics\\1. Customer Segmentation by RFM Model\\0. Raw Data\\customer_registered.csv")
                         <br>
-                        <br><i># Convert "created_date" column to Date type by using the Pandas Python module;</i>
+                        <br><i><b># Convert "created_date" column to Date type by using the Pandas Python module;</b></i>
                         <br>customer_registered['created_date'] = pd.to_datetime(customer_registered['created_date']).dt.date
                         <br>customer_registered['created_date'] = pd.to_datetime(customer_registered['created_date'])
                         <br>
-                        <br><i># Convert "stopdate" column to Date type by using the Pandas Python module;</i>
+                        <br><i><b># Convert "stopdate" column to Date type by using the Pandas Python module;</b></i>
                         <br>customer_registered['stopdate'] = pd.to_datetime(customer_registered['stopdate']).dt.date
                         <br>customer_registered['stopdate'] = pd.to_datetime(customer_registered['stopdate'])
                         <br>
@@ -125,13 +125,13 @@
                 </ul>
                 <div class="code">
                     <p>
-                        <i># Read "customer_transaction" table from "customer_transaction.csv" file;</i>
+                        <i><b># Read "customer_transaction" table from "customer_transaction.csv" file;</b></i>
                         <br>customer_transaction = pd.read_csv("C:\\Users\\Admin\\OneDrive - VNU-HCMUS\Data Analytics\\1. Customer Segmentation by RFM Model\\0. Raw Data\\customer_transaction.csv")
                         <br>
-                        <br><i># Convert "Purchase_Date" column to Date type by using the Pandas Python module;</i>
+                        <br><i><b># Convert "Purchase_Date" column to Date type by using the Pandas Python module;</b></i>
                         <br>customer_transaction['Purchase_Date'] = pd.to_datetime(customer_transaction['Purchase_Date'])
                         <br>
-                        <br><i># Export "customer_transaction.csv" file after cleaning.</i>
+                        <br><i><b># Export "customer_transaction.csv" file after cleaning.</b></i>
                         <br>customer_transaction.to_csv("../1. Clean Data/customer_transaction.csv", index=False)
                     </p>
                 </div>
@@ -144,16 +144,16 @@
                 </ul>
                 <div class="code">
                     <p>
-                        <i># Read "location" table from "customer_transaction.csv" file;</i>
+                        <i><b># Read "location" table from "customer_transaction.csv" file;</b></i>
                         <br>location = pd.read_csv("C:\\Users\\Admin\\OneDrive - VNU-HCMUS\\Data Analytics\\1. Customer Segmentation by RFM Model\\0. Raw Data\\location.csv")
                         <br>
-                        <br><i># Convert "LocationID" column to float type by using the Pandas Python module;</i>
+                        <br><i><b># Convert "LocationID" column to float type by using the Pandas Python module;</b></i>
                         <br>location['LocationID'] = location['LocationID'].astype(float)
                         <br>
-                        <br><i># Convert "BranchCode" column to float type by using the Pandas Python module;</i>
+                        <br><i><b># Convert "BranchCode" column to float type by using the Pandas Python module;</b></i>
                         <br>location['BranchCode'] = location['BranchCode'].astype(float)
                         <br>
-                        <br><i># Export "location.csv" file after cleaning.</i>
+                        <br><i><b># Export "location.csv" file after cleaning.</b></i>
                         <br>location.to_csv("../1. Clean Data/location.csv", index=False)
                     </p>
                 </div>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="../assets/img/favicon.png" rel="icon">
+  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>        
+    <main id="main">
+
+    <!-- ======= About Section ======= -->
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-title">
+                <h2>Opening a Coffee Shop in Nha Trang City</h2>     
+            </div>
+
+            <div class="resume-item">
+                <h3 class="resume-title">Introduction</h3>                
+                <p>This project is carried out to find a suitable location for opening a coffee shop and targets individuals who intend to open a coffee shop in Nha Trang City but are unsure which commune or ward to choose. It aims to identify areas with the lowest coffee shop competition density to minimize competitive risks. Additionally, the project considers objective factors such as real estate costs (whether for renting or purchasing business premises), population density (avoiding areas with low population), and the presence of companies or factories (in order to cater to workers) when making decisions. In addition, this project can also serve as inspiration for various other business models, not limited to opening a coffee shop.</p>                
+            </div>
+            
+            <div class="resume-item">
+                <h3 class="resume-title">Data Information</h3>
+                <h4>Collect data description</h4>
+                <p>The following data should be collected:</p>
+                <ul>
+                    <li>The communes and wards name of Nha Trang City, along with the longitude and latitude (in order to draw on the map);</li>
+                    <li>The population density, number of companies and enterprises for each commune and ward;</li>
+                    <li>The density of locations for each commune and ward in Nha Trang City (using Foursquare API).</li>
+                </ul>
+
+                <h4>Crawl and clean data with Python</h4>
+                <p>The communes and wards name of Nha Trang City:</p>
+                <ul>
+                    <li>Collect the list of communes and wards of Nha Trang City from website by using Beautiful Soup library;</li>
+                    <li>Converts Vietnamese text with accents to text without accents through Regex library.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Collect the list of communes and wards of Nha Trang City from website by using Beautiful Soup library;</b></i>
+                        <br>from bs4 import BeautifulSoup
+                        <br>import requests
+                        <br>data = requests.get("https://vi.wikipedia.org/wiki/Th%E1%BB%83_lo%E1%BA%A1i:X%C3%A3,_ph%C6%B0%E1%BB%9Dng_thu%E1%BB%99c_th%C3%A0nh_ph%E1%BB%91_Nha_Trang").text
+                        <br>soup = BeautifulSoup(data, 'html.parser')
+                        <br>commune_ward_list = []
+                        <br>for row in soup.find_all("div", class_="mw-category")[0].findAll("li"):
+                        <br>&nbsp;&nbsp;&nbsp;commune_ward_list.append(row.text.split(",")[0].split(" (")[0])
+                        <br>
+                        <br><i><b># Converts Vietnamese text with accents to text without accents through Regex library.</b></i>
+                        <br>import re                
+                        <br>patterns = {
+                        <br>&nbsp;&nbsp;&nbsp;'[àáảãạăắằẵặẳâầấậẫẩ]': 'a',
+                        <br>&nbsp;&nbsp;&nbsp;'[đ]': 'd',
+                        <br>&nbsp;&nbsp;&nbsp;'[èéẻẽẹêềếểễệ]': 'e',
+                        <br>&nbsp;&nbsp;&nbsp;'[ìíỉĩị]': 'i',
+                        <br>&nbsp;&nbsp;&nbsp;'[òóỏõọôồốổỗộơờớởỡợ]': 'o',
+                        <br>&nbsp;&nbsp;&nbsp;'[ùúủũụưừứửữự]': 'u',
+                        <br>&nbsp;&nbsp;&nbsp;'[ỳýỷỹỵ]': 'y'}
+                        <br>                        
+                        <br>def convert(text):
+                        <br>&nbsp;&nbsp;&nbsp;output = text
+                        <br>&nbsp;&nbsp;&nbsp;for regex, replace in patterns.items():
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output = re.sub(regex, replace, output)
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output = re.sub(regex.upper(), replace.upper(), output)
+                        <br>&nbsp;&nbsp;&nbsp;return output
+                        <br>                        
+                        <br>commune_ward_list_new = []
+                        <br>for row in commune_ward_list:
+                        <br>&nbsp;&nbsp;&nbsp;row = convert(row)
+                        <br>&nbsp;&nbsp;&nbsp;commune_ward_list_new.append(row)                        
+                        <br>commune_ward_list = commune_ward_list_new
+                    </p>
+                </div>
+                <p>The longitude and latitude of the communes and wards of Nha Trang City:</p>
+                <ul>
+                    <li>Get the coordinates by using Geocoder library;</li>
+                    <li>Create <b>"nhatrang"</b> dataframe to populate the coordinates into latitude and longitude.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Get the coordinates by using Geocoder library;</b></i>
+                        <br>import geocoder
+                        <br>def get_lat_long(neighborhood):
+                        <br>&nbsp;&nbsp;&nbsp;lat_long = None
+                        <br>&nbsp;&nbsp;&nbsp;while(lat_long is None):
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;g = geocoder.arcgis('{}, Nha Trang, Khanh Hoa, Vietnam'.format(neighborhood))
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lat_long = g.latlng
+                        <br>&nbsp;&nbsp;&nbsp;return lat_long                        
+                        <br>lat_long = [get_lat_long(neighborhood) for neighborhood in commune_list]
+                        <br>
+                        <br><i><b># Create "nhatrang" dataframe to populate the coordinates into latitude and longitude.</b></i>
+                        <br>import pandas as pd
+                        <br>nhatrang = pd.DataFrame(commune_list, columns=['Communes'])
+                        <br>coordinates = pd.DataFrame(lat_long, columns=['Latitude', 'Longitude'])
+                        <br>nhatrang['Latitude'] = coordinates['Latitude']
+                        <br>nhatrang['Longitude'] = coordinates['Longitude']
+                    </p>
+                </div>
+                <p>The population, square and density of the communes and wards of Nha Trang City:</p>
+                <ul>
+                    <li>Collect population, square of the communes and wards of Nha Trang City from website by using Beautiful Soup library;</li>
+                    <li>Converts Vietnamese text with accents to text without accents through Regex library;</li>
+                    <li>Create dataframe to populate the population and square;</li>
+                    <li>Merge <b>"nhatrang"</b> dataframe with the population and square dataframe;</li>
+                    <li>Convert <b>"Square"</b> column to float type and <b>"Population"</b> column to int type by using the Pandas Python module;</li>
+                    <li>Caculate the density of the communes and wards of Nha Trang City.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Collect population, square of the communes and wards of Nha Trang City from website by using Beautiful Soup library;</b></i>
+                        <br>data = requests.get("https://gis.khanhhoa.gov.vn/public/2/568/").text
+                        <br>soup = BeautifulSoup(data, 'html.parser')
+                        <br>population_commune_list = []
+                        <br>for row in soup.find_all("div", class_="scrollable")[0].findAll("label"):
+                        <br>&nbsp;&nbsp;&nbsp;if "Phường " in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;population_commune_list.append(row.text.split("Phường ")[1])
+                        <br>&nbsp;&nbsp;&nbsp;if "Xã " in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;population_commune_list.append(row.text.split("Xã ")[1])
+                        <br>
+                        <br>square = []
+                        <br>population = []
+                        <br>for row in soup.find_all("div", class_="scrollable")[0].findAll("li"):
+                        <br>&nbsp;&nbsp;&nbsp;if "Diện" in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;square.append(row.text.split(" ")[-2])
+                        <br>&nbsp;&nbsp;&nbsp;if "Dân" in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;population.append(row.text.split(" ")[-1])
+                        <br>square = square[1:]
+                        <br>population = population[1:]
+                        <br>
+                        <br><i><b># Converts Vietnamese text with accents to text without accents through Regex library;</b></i>
+                        <br>population_commune_list_new = []
+                        <br>for row in population_commune_list:
+                        <br>&nbsp;&nbsp;&nbsp;row = convert(row)
+                        <br>&nbsp;&nbsp;&nbsp;population_commune_list_new.append(row)
+                        <br>population_commune_list = population_commune_list_new
+                        <br>
+                        <br><i><b># Create dataframe to populate the population and square;</b></i>
+                        <br>population_list = pd.DataFrame(population_commune_list, columns=["Commune"])
+                        <br>population_list["Square"] = square
+                        <br>population_list["Population"] = population
+                        <br>
+                        <br><i><b># Merge "nhatrang" dataframe with the population and square dataframe;</b></i>
+                        <br>nhatrang = nhatrang.merge(population_list,on='Commune',how='inner')
+                        <br>
+                        <br><i><b># Convert "Square" column to float type and "Population" column to int type by using the Pandas Python module;</b></i>
+                        <br>for i in range(len(nhatrang)):
+                        <br>&nbsp;&nbsp;&nbsp;nhatrang["Square"][i] = nhatrang["Square"][i].replace(",", ".")
+                        <br>&nbsp;&nbsp;&nbsp;nhatrang["Population"][i] = nhatrang["Population"][i].replace(".", "")
+                        <br>nhatrang['Square'] = nhatrang["Square"].astype(float)
+                        <br>nhatrang["Population"] = nhatrang['Population'].astype(int)
+                        <br>
+                        <br><i><b># Caculate the density of the communes and wards of Nha Trang City.</b></i>
+                        <br>nhatrang["Density"] = round(nhatrang["Population"] / nhatrang["Square"],0).astype(int)
+                    </p>
+                </div>
+                <p>The average housing price of the communes and wards of Nha Trang City:</p>
+                <ul>
+                    <li>Collect the link which contains housing price of the communes and wards of Nha Trang City from website by using Beautiful Soup library;</li>
+                    <li>Calculate the average housing price of the communes and wards of Nha Trang City;</li>
+                    <li>Converts Vietnamese text with accents to text without accents through Regex library;</li>
+                    <li>Create dataframe to populate the average housing price;</li>
+                    <li>Merge "nhatrang" dataframe with the average housing price dataframe.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Collect the link which contains housing price of the communes and wards of Nha Trang City from website by using Beautiful Soup library;</b></i>
+                        <br>data = requests.get("https://mogi.vn/gia-nha-dat-tp-nha-trang-qd410").text
+                        <br>soup = BeautifulSoup(data, 'html.parser')
+                        <br>price_commune_link = []
+                        <br>price_commune_list = []
+                        <br>for row in soup.find_all("div", class_="widget similar")[1].findAll("a"):
+                        <br>&nbsp;&nbsp;&nbsp;price_commune_link.append(row.get("href"))
+                        <br>&nbsp;&nbsp;&nbsp;if "Phường " in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;price_commune_list.append(row.text.split(" (")[0].split("Phường ")[1])
+                        <br>&nbsp;&nbsp;&nbsp;if "Xã " in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;price_commune_list.append(row.text.split(" (")[0].split("Xã ")[1])
+                        <br>
+                        <br><i><b># Calculate the average housing price of the communes and wards of Nha Trang City;</b></i>
+                        <br>import numpy as np
+                        <br>average_price = []
+                        <br>for i in range(len(price_commune_link)):
+                        <br>&nbsp;&nbsp;&nbsp;data = requests.get("https://mogi.vn" + price_commune_link[i]).text
+                        <br>&nbsp;&nbsp;&nbsp;soup = BeautifulSoup(data, 'html.parser')
+                        <br>&nbsp;&nbsp;&nbsp;price_list = []
+                        <br>&nbsp;&nbsp;&nbsp;for row in soup.find("ul", class_="props").find_all("div", class_="prop-info"):
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;square = row.find("ul", class_="prop-attr").findAll("li")[0].text.split(" ")[0]
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;price_string = row.find("div", class_="price").text
+                        <br>        
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if len(price_string.split(" ")) > 2:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;price = price_string.split(" ")[0] + price_string.split(" ")[2]
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if price_string.split(" ")[1] == "tỷ": price = price_string.split(" ")[0] + "000"
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else: price = price_string.split(" ")[0]
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;price_list.append(round(int(price)/int(square),1))
+                        <br>&nbsp;&nbsp;&nbsp;average_price.append(round(np.mean(price_list),1))
+                        <br>
+                        <br><i><b># Converts Vietnamese text with accents to text without accents through Regex library;</b></i>
+                        <br>price_commune_list_new = []
+                        <br>for row in price_commune_list:
+                        <br>&nbsp;&nbsp;&nbsp;row = convert(row)
+                        <br>&nbsp;&nbsp;&nbsp;price_commune_list_new.append(row)                        
+                        <br>price_commune_list = price_commune_list_new
+                        <br>
+                        <br><i><b># Create dataframe to populate the average housing price;</b></i>
+                        <br>price_list = pd.DataFrame(price_commune_list, columns=["Commune"])
+                        <br>price_list["Housing price"] = average_price
+                        <br>
+                        <br><i><b># Merge "nhatrang" dataframe with the average housing price dataframe.</b></i>
+                        <br>nhatrang = nhatrang.merge(price_list,on='Commune',how='inner')
+                    </p>
+                </div>
+                <p>The number of companies and enterprises of the communes and wards of Nha Trang City:</p>
+                <ul>
+                    <li>Collect the link which contains company infomations of the communes and wards of Nha Trang City from website by using Beautiful Soup library;</li>
+                    <li>Collect the number of companies of the communes and wards of Nha Trang City;</li>
+                    <li>Converts Vietnamese text with accents to text without accents through Regex library;</li>
+                    <li>Create dataframe to populate the number of companies;</li>
+                    <li>Merge <b>"nhatrang"</b> dataframe with the number of companies dataframe;</li>
+                    <li>Convert <b>"Total company"</b> column to float type by using the Pandas Python module.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Collect the link which contains company infomations of the communes and wards of Nha Trang City from website by using Beautiful Soup library;</b></i>
+                        <br>data = requests.get("https://tracuudoanhnghiep.vn/tinh-khanh-hoa/thanh-pho-nha-trang").text
+                        <br>soup = BeautifulSoup(data, 'html.parser')
+                        <br>company_commune_link = []
+                        <br>company_commune_list = []
+                        <br>for row in soup.find("ul", class_="province").findAll("a"):
+                        <br>&nbsp;&nbsp;&nbsp;company_commune_link.append(row.get("href"))
+                        <br>&nbsp;&nbsp;&nbsp;if "P. " in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;company_commune_list.append(row.text.split(" (")[0].split("P. ")[1])
+                        <br>&nbsp;&nbsp;&nbsp;if "Xã " in row.text:
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;company_commune_list.append(row.text.split(" (")[0].split("Xã ")[1])
+                        <br>
+                        <br><i><b># Collect the number of companies of the communes and wards of Nha Trang City;</b></i>
+                        <br>total_company = []
+                        <br>for i in range(len(company_commune_link)):
+                        <br>&nbsp;&nbsp;&nbsp;data = requests.get("https://tracuudoanhnghiep.vn/" + company_commune_link[i]).text
+                        <br>&nbsp;&nbsp;&nbsp;soup = BeautifulSoup(data, 'html.parser')
+                        <br>&nbsp;&nbsp;&nbsp;row = soup.find("h3", class_="category").find("label")
+                        <br>&nbsp;&nbsp;&nbsp;total_company.append(row.text)
+                        <br>
+                        <br><i><b># Converts Vietnamese text with accents to text without accents through Regex library;</b></i>
+                        <br>company_commune_list_new = []
+                        <br>for row in company_commune_list:
+                        <br>&nbsp;&nbsp;&nbsp;row = convert(row)
+                        <br>&nbsp;&nbsp;&nbsp;company_commune_list_new.append(row)
+                        <br>company_commune_list = company_commune_list_new
+                        <br>
+                        <br><i><b># Create dataframe to populate the number of companies;</b></i>
+                        <br>company_list = pd.DataFrame(company_commune_list, columns=["Commune"])
+                        <br>company_list["Total company"] = total_company
+                        <br>
+                        <br># Merge "nhatrang" dataframe with the number of companies dataframe
+                        <br>nhatrang = nhatrang.merge(company_list,on='Commune',how='inner')
+                        <br>
+                        <br><i><b># Convert "Total company" column to float type by using the Pandas Python module;</b></i>
+                        <br>for i in range(len(nhatrang)):
+                        <br>&nbsp;&nbsp;&nbsp;nhatrang["Total company"][i] = nhatrang["Total company"][i].replace(",", "")
+                        <br>nhatrang['Total company'] = nhatrang["Total company"].astype(int)
+                        <br>
+                        <br><i><b># Export "nhatrang_information.csv" file after cleaning.</b></i>
+                        <br>nhatrang.to_csv("../0. Clean Data/nhatrang_information.csv", index=False)
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/1.png" alt="The infomation of the communes and wards of Nha Trang City" width="65%">
+                        <br><i>Picture 1. The infomation of the communes and wards of Nha Trang City</i>
+                    </center>
+                </p>
+                <p>Create map and add makers of the communes and wards of Nha Trang City:</p>
+                <ul>
+                    <li>Create map of Nha Trang City by using latitude and longitude values;</li>
+                    <li>Add markers to map of the communes and wards of Nha Trang City.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Create map of Nha Trang City by using latitude and longitude values;</b></i>
+                        <br>import folium
+                        <br>g = geocoder.arcgis('Nha Trang, Khanh Hoa, Vietnam').latlng
+                        <br>latitude = g[0]
+                        <br>longitude = g[1]
+                        <br>map = folium.Map(location=[latitude, longitude], zoom_start=12)
+                        <br>
+                        <br><i><b># Add markers to map of the communes and wards of Nha Trang City.</b></i>
+                        <br>for latitude, longitude, neighborhood in zip(nhatrang['Latitude'], nhatrang['Longitude'], nhatrang['Commune']):
+                        <br>&nbsp;&nbsp;&nbsp;label = '{}'.format(neighborhood)
+                        <br>&nbsp;&nbsp;&nbsp;label = folium.Popup(label, parse_html=True)
+                        <br>&nbsp;&nbsp;&nbsp;folium.CircleMarker([latitude, longitude], radius=5, popup=label, color='blue', fill=True, fill_color='#3186cc', fill_opacity=0.7).add_to(map)
+                    </p>
+                </div>                
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/2.png" alt="The map of the communes and wards of Nha Trang City" width="75%">
+                        <br><i>Picture 2. The map of the communes and wards of Nha Trang City</i>
+                    </center>
+                </p>
+                <p>Collect the number of venues of the communes and wards of Nha Trang City:</p>
+                <ul>
+                    <li>Collect venue information of the communes and wards of Nha Trang City by using Foursquare API.</li>
+                </ul>
+                <div class="code">
+                    <p>
+                        <i><b># Collect venue information of the communes and wards of Nha Trang City by using Foursquare API;</b></i>
+                        <br>CLIENT_ID = 'Q0UO3BYFEAJJRKEBAYDGA4BJ5DY2GPKTW053JZCANOXCPPQX'
+                        <br>CLIENT_SECRET = 'Q0OXCBE4XDUSEE0HLSONDUVAFO1XMRKDADAEXFAHNGOO40FU'
+                        <br>VERSION = '20180323'
+                        <br>
+                        <br>def near_by(communes, latitudes, longitudes, radius=2000, limit=150):
+                        <br>&nbsp;&nbsp;&nbsp;venues_list=[]    
+                        <br>&nbsp;&nbsp;&nbsp;for commune, latitude, longitude in zip(communes, latitudes, longitudes):
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, limit)
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results = requests.get(url, verify=False).json()["response"]["groups"][0]["items"]
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;venues_list.append([(commune, latitude, longitude, v['venue']['name'], v['venue']['location']['lat'], v['venue']['location']['lng'], v['venue']['categories'][0]['name']) for v in results])
+                        <br>
+                        <br>&nbsp;&nbsp;&nbsp;venues = pd.DataFrame([item for venue_list in venues_list for item in venue_list])
+                        <br>&nbsp;&nbsp;&nbsp;venues.columns = ['Commune', 'Commune latitude', 'Commune longitude', 'Venue', 'Venue latitude', 'Venue longitude', 'Venue category']                            
+                        <br>&nbsp;&nbsp;&nbsp;return(venues)                        
+                        <br>nhatrang_venues = near_by(communes = nhatrang['Commune'], latitudes = nhatrang['Latitude'], longitudes = nhatrang['Longitude'])
+                        <br>
+                        <br><i><b># Export "nhatrang_venues.csv" file after cleaning.</b></i>
+                        <br>nhatrang_venues.to_csv("../0. Clean Data/nhatrang_venues.csv", index=False)
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/3.png" alt="The venue information of the communes and wards of Nha Trang City" width="100%">
+                        <br><i>Picture 3. The venue information of the communes and wards of Nha Trang City</i>
+                    </center>
+                </p>
+            </div>
+
+            <div class="resume-item">
+                <h3 class="resume-title">Data Analytics</h3>
+                <h4>Exploratory data analysis with Python</h4>
+                <p>Use basic statistical methods and data analysis to obtain information such as: The communes and wards with the most venues; The communes and wards with the most types of businesses; The top 10 most popular types of businesses; The top 10 most popular types of businesses in each commune and ward.</p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># The communes and wards with the most venues;</b></i>
+                        <br>import matplotlib
+                        <br>ax = nhatrang_total_venues.sort_values(by="Venue", ascending=False).plot(x="Commune", y="Venue", kind="bar")
+                        <br>ax.set_ylabel("Number of venues")
+                        <br>
+                        <br><i><b># The communes and wards with the most types of businesses;</b></i>
+                        <br>nhatrang_venues_category = (nhatrang_venues.groupby(['Commune','Venue category']).count().reset_index()[['Commune', 'Venue category']].groupby('Commune').count().reset_index())
+                        <br>ax = nhatrang_venues_category.sort_values(by="Venue category", ascending=False).plot(x="Commune", y="Venue category", kind="bar")
+                        <br>ax.set_ylabel("Number of categories")
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/4-1.png" alt="The most venues of the communes and wards of Nha Trang City" width="40%">
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/4-2.png" alt="The most types of businesses of the communes and wards of Nha Trang City" width="39.2%">
+                        <br><i>Picture 4. The most venues and types of businesses of the communes and wards of Nha Trang City</i>
+                    </center>
+                </p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># The top 10 most popular types of businesses;</b></i>
+                        <br>most_types_venues = nhatrang_venues.groupby('Venue category').count().sort_values(by="Venue", ascending=False).reset_index()[["Venue category", "Venue"]]
+                        <br>most_types_venues.head(10)
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/5.png" alt="The top 10 most popular types of businesses of the communes and wards of Nha Trang City" width="23%">
+                        <br><i>Picture 5. The top 10 most popular types of businesses of the communes and wards of Nha Trang City</i>
+                    </center>
+                </p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># Calculate the average frequency of business types in communes and wards after using One-hot encoding;</b></i>
+                        <br>nhatrang_encoding = pd.get_dummies(nhatrang_venues[['Venue category']], prefix="", prefix_sep="")
+                        <br>nhatrang_encoding['Commune'] = nhatrang_venues['Commune'] 
+                        <br>nhatrang_encoding = nhatrang_encoding[[nhatrang_encoding.columns[-1]] + list(nhatrang_encoding.columns[:-1])]
+                        <br>nhatrang_avg_encoding = nhatrang_encoding.groupby('Commune').mean().reset_index()
+                        <br>
+                        <br><i><b># The top 10 most popular types of businesses in each commune and ward base on the average frequency.</b></i>
+                        <br>def common_venues(row):
+                        <br>&nbsp;&nbsp;&nbsp;row_categories = row.iloc[1:]
+                        <br>&nbsp;&nbsp;&nbsp;row_categories_sorted = row_categories.sort_values(ascending=False)
+                        <br>&nbsp;&nbsp;&nbsp;return row_categories_sorted.index.values[0:10]
+                        <br>
+                        <br>columns = ['Commune']
+                        <br>for ind in np.arange(10):
+                        <br>&nbsp;&nbsp;&nbsp;columns.append(ind+1)
+                        <br>top_type = pd.DataFrame(columns=columns)
+                        <br>top_type['Commune'] = nhatrang_avg_encoding['Commune']
+                        <br>for ind in np.arange(nhatrang_avg_encoding.shape[0]):
+                        <br>&nbsp;&nbsp;&nbsp;top_type.iloc[ind, 1:] = common_venues(nhatrang_avg_encoding.iloc[ind, :])
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/6.png" alt="The top 10 types of businesses in each commune and ward of Nha Trang City" width="100%">
+                        <br><i>Picture 6. The top 10 types of businesses in each commune and ward of Nha Trang City</i>
+                    </center>
+                </p>
+
+                <h4>K-means clustering</h4>
+                <p>K-means is an unsupervised learning method for clustering data points. The algorithm iteratively divides data points into K clusters by minimizing the variance in each cluster. First, each data point is randomly assigned to one of the K clusters. Then, we compute the centroid (functionally the center) of each cluster, and reassign each data point to the cluster with the closest centroid. We repeat this process until the cluster assignments for each data point are no longer changing.</p>
+                <p>K-means clustering requires us to select K, the number of clusters we want to group the data into. The elbow method lets us graph the inertia (a distance-based metric) and visualize the point at which it starts decreasing linearly. This point is referred to as the "eblow" and is a good estimate for the best value for K based on our data.</p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># Utilize the elbow method to visualize the intertia for different values of K;</b></i>
+                        <br>from sklearn.cluster import KMeans
+                        <br>from scipy.spatial.distance import cdist
+                        <br>import matplotlib.pyplot as plt
+                        <br>nhatrang_coffee_encoding = nhatrang_avg_encoding[["Commune", "Coffee Shop"]]
+                        <br>clustering = nhatrang_coffee_encoding.drop(["Commune"], axis = 1)
+                        <br>                        
+                        <br>distortions = []
+                        <br>for k in range(1, 10):
+                        <br>&nbsp;&nbsp;&nbsp;kmeans = KMeans(n_clusters=k, random_state=0).fit(clustering)
+                        <br>&nbsp;&nbsp;&nbsp;distortions.append(sum(np.min(cdist(clustering, kmeans.cluster_centers_, 'euclidean'), axis=1)) / clustering.shape[0])
+                        <br>
+                        <br>plt.plot(range(1, 10), distortions, 'bx-')
+                        <br>plt.xlabel('K')
+                        <br>plt.ylabel('Distortion')
+                        <br>plt.title('The Elbow Method showing the optimal K')
+                        <br>plt.show()
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/7.png" alt="The Elbow Method showing the optimal K of K-means" width="40%">
+                        <br><i>Picture 7. The Elbow Method showing the optimal K of K-means</i>
+                    </center>
+                </p>
+                <p>The elbow method shows that 3 is a good value for K, so we retrain and visualize the result:</p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># Create dataframe that includes the "Cluster label" column (K = 3);</b></i>
+                        <br>kmeans = KMeans(n_clusters=3, random_state=0).fit(clustering)
+                        <br>nhatrang_kmeans = nhatrang_coffee_encoding.copy()
+                        <br>nhatrang_kmeans["Cluster label"] = kmeans.labels_
+                        <br>
+                        <br><i><b># Merge "nhatrang_kmeans" dataframe with "nhatrang" dataframe to add latitude and longitude for each neighborhood;</b></i>
+                        <br>nhatrang_kmeans = nhatrang_kmeans.join(nhatrang.set_index("Commune"), on="Commune")
+                        <br>nhatrang_kmeans.sort_values(["Cluster label"], inplace=True)
+                        <br>
+                        <br><i><b># Set color scheme for the clusters;</b></i>
+                        <br>import matplotlib.cm as cm
+                        <br>import matplotlib.colors as colors                        
+                        <br>x = np.arange(3)
+                        <br>ys = [i+x+(i*x)**2 for i in range(3)]
+                        <br>colors_array = cm.rainbow(np.linspace(0, 1, len(ys)))
+                        <br>rainbow = [colors.rgb2hex(i) for i in colors_array]
+                        <br>
+                        <br><i><b># Create map and add K-means clustering markers to the map</b></i>
+                        <br>map_kmeans = folium.Map(location=[latitude, longitude], zoom_start=12)
+                        <br>markers_colors = []
+                        <br>for lat, lon, poi, cluster in zip(nhatrang_kmeans['Latitude'], nhatrang_kmeans['Longitude'], nhatrang_kmeans['Commune'], nhatrang_kmeans['Cluster label']):
+                        <br>&nbsp;&nbsp;&nbsp;label = folium.Popup(str(poi) + ' - Cluster ' + str(cluster), parse_html=True)
+                        <br>&nbsp;&nbsp;&nbsp;folium.CircleMarker([lat, lon], radius=5, popup=label, color=rainbow[cluster-1], fill=True, fill_color=rainbow[cluster-1], fill_opacity=0.7).add_to(map_kmeans)
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/8.png" alt="The map of the communes and wards of Nha Trang City with K-means clustering markers" width="75%">
+                        <br><i>Picture 8. The map of the communes and wards of Nha Trang City with K-means clustering markers</i>
+                    </center>
+                </p>
+                <p>Cluster 0 includes suburban communes such as Vinh Phuong, Vinh Luong, Phuoc Dong, etc. These communes are still rural areas, where people mainly live on agricultural farming and livestock poultry farming. Therefore, the demand for using food and beverage services is not high. Most of the subjects who need to eat and shop will move to the city center.</p>
+                <p>Cluster 1 mainly consists of newly developed communes and new residential areas such as Vinh Thai, Vinh Ngoc, Vinh Thanh. Therefore, economic activities, restaurants, and population density still have a lot of potentials. Almost the density of restaurants is not too crowded and famous yet. In addition, Cluster 2 focuses on wards in the city center, where most of the entertainment venues are concentrated.</p>
+
+                <h4>K-modes clustering</h4>
+                <p>K-modes is an unsupervised machine-learning technique used to group a set of data objects into a specified number of clusters, based on their categorical attributes. The algorithm is called “K-Mode” because it uses modes (i.e. the most frequent values) instead of means or medians to represent the clusters. Elbow method is used to find the optimal number of clusters.</p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># Count the coffee shop venues by communes and wards;</b></i>
+                        <br>coffee_shop = nhatrang_venues[nhatrang_venues["Venue category"] == "Coffee Shop"]
+                        <br>coffee_shop = coffee_shop[['Commune','Venue']].groupby(['Commune']).agg('count').reset_index()
+                        <br>coffee_shop = nhatrang.merge(coffee_shop,on='Commune',how='left')[["Commune", "Venue"]]
+                        <br>coffee_shop['Venue'] = coffee_shop['Venue'].fillna(0)
+                        <br>
+                        <br><i><b># Convert quantitative data into categorical data;</b></i>
+                        <br>coffee_shop['Venue'].describe()
+                        <br>coffee_shop['Type'] = coffee_shop.apply(lambda x: 'Low' if (x['Venue'] >= 0 and x['Venue'] < 1) else ('Medium' if (x['Venue'] >= 1 and x['Venue'] < 3) else ('High' if (x['Venue'] >=3 and x['Venue'] < 5) else 'Very High')), axis = 1)
+                        <br>coffee_shop.drop(columns="Venue", inplace=True)
+                        <br>
+                        <br><i><b># Utilize the elbow method to visualize the intertia for different values of K;</b></i>
+                        <br>from kmodes.kmodes import KModes
+                        <br>cost = []
+                        <br>for num_clusters in range(1,10):
+                        <br>&nbsp;&nbsp;&nbsp;kmode = KModes(n_clusters=num_clusters, init = "random", n_init = 5, verbose=1)
+                        <br>&nbsp;&nbsp;&nbsp;kmode.fit_predict(coffee_shop)
+                        <br>&nbsp;&nbsp;&nbsp;cost.append(kmode.cost_)
+                        <br>
+                        <br>plt.plot(range(1,10), cost, 'bx-')
+                        <br>plt.xlabel('K')
+                        <br>plt.ylabel('Cost')
+                        <br>plt.title('The Elbow Method showing the optimal K')
+                        <br>plt.show()
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/9.png" alt="The Elbow Method showing the optimal K of K-modes" width="40%">
+                        <br><i>Picture 9. The Elbow Method showing the optimal K of K-modes</i>
+                    </center>
+                </p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># Create dataframe that includes the "Cluster label" column (K = 3);</b></i>
+                        <br>kmodes = KModes(n_clusters=3, init = "random", n_init = 5, verbose=1)
+                        <br>nhatrang_kmodes = coffee_shop.copy()
+                        <br>nhatrang_kmodes["Cluster label"] = kmodes.fit_predict(coffee_shop)
+                        <br>
+                        <br><i><b># Merge "nhatrang_kmodes" dataframe with "nhatrang" dataframe to add latitude and longitude for each neighborhood;</b></i>
+                        <br>nhatrang_kmodes = nhatrang_kmodes.join(nhatrang.set_index("Commune"), on="Commune")
+                        <br>nhatrang_kmodes.sort_values(["Cluster label"], inplace=True)
+                        <br>
+                        <br><i><b># Create map and add K-means clustering markers to the map</b></i>
+                        <br>map_kmodes = folium.Map(location=[latitude, longitude], zoom_start=12)
+                        <br>markers_colors = []
+                        <br>for lat, lon, poi, cluster in zip(nhatrang_kmodes['Latitude'], nhatrang_kmodes['Longitude'], nhatrang_kmodes['Commune'], nhatrang_kmodes['Cluster label']):
+                        <br>&nbsp;&nbsp;&nbsp;label = folium.Popup(str(poi) + ' - Cluster ' + str(cluster), parse_html=True)
+                        <br>&nbsp;&nbsp;&nbsp;folium.CircleMarker([lat, lon], radius=5, popup=label, color=rainbow[cluster-1], fill=True, fill_color=rainbow[cluster-1], fill_opacity=0.7).add_to(map_kmodes)
+                    </p>                    
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/10.png" alt="The map of the communes and wards of Nha Trang City with K-modes clustering markers" width="75%">
+                        <br><i>Picture 10. The map of the communes and wards of Nha Trang City with K-modes clustering markers</i>
+                    </center>
+                </p>
+                <p>Similar to K-means, in this case, Cluster 2 includes suburban communes and wards, and has not really developed entertainment services. Meanwhile, Cluster 0 focuses on wards about 5-7 km from the city center, most of the communes and wards in this cluster are new urban areas that have started to develop in recent years. Besides, Cluster 1 includes wards located in the city center, and most dining services are usually concentrated in this area.</p>
+
+                <h4>Other factors analysis</h4>
+                <p>Analyzing where is the suitable commune to open a coffee shop according to average housing price, population density, K-means clustering label and total company after classifying the levels housing prices and population density.</p>
+                <div class="code" style="margin-left: 0px;">
+                    <p>
+                        <i><b># Classify the levels of average housing prices of the communes and wards of Nha Trang City;</b></i>
+                        <br>other_factors = nhatrang_kmeans[["Commune", "Housing price", "Density", "Cluster label", "Total company"]]
+                        <br>other_factors["Housing price"].describe()
+                        <br>other_factors['Housing price level'] = other_factors.apply(lambda x: 'Low' if (x['Housing price'] >= 5.5 and x['Housing price'] < 29.9) else ('Medium' if (x['Housing price'] >= 29.9 and x['Housing price'] < 46.5) else ('High' if (x['Housing price'] >= 46.5 and x['Housing price'] < 86.8) else 'Very High')), axis = 1)b
+                        <br>
+                        <br><i><b># Classify the levels of population density of the communes and wards of Nha Trang City;</b></i>
+                        <br>other_factors["Density"].describe()
+                        <br>other_factors['Density level'] = other_factors.apply(lambda x: 'Low' if (x['Density'] >= 272 and x['Density'] < 998.5) else ('Medium' if (x['Density'] >= 998.5 and x['Density'] < 9144) else ('High' if (x['Density'] >= 9144 and x['Density'] < 22428) else 'Very High')), axis = 1)
+                        <br>
+                        <br><i><b># Count the number of communes and wards according to each level of housing prices and population density.</b></i>
+                        <br>pd.DataFrame(other_factors.groupby(['Housing price level','Density level'])['Density level'].count())
+                    </p>
+                </div>
+                <p>
+                    <center>
+                        <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/11.png" alt="The number of communes and wards according to each level of housing prices and population density" width="35%">
+                        <br><i>Picture 11. The number of communes and wards according to each level of housing prices and population density</i>
+                    </center>
+                </p>
+                <p>From the above results, we only want communes and wards with moderate or low real estate costs compared to population density (meaning population density level is higher than housing price Level), not those with high real estate costs but low population density. Or communes and wards with high population density and equally high real estate costs also have no benefits. We divide into 2 groups:</p>
+                <ul>
+                    <li>Low real estate cost - High population density (Housing price level low - Density level high)</li>
+                    <div class="code" style="margin-left: 0px;">
+                        <p>
+                            <i><b># Filter the communes and ward have the low housing price level low and the high density level;</b></i>
+                            <br>other_factors[(other_factors['Housing price level'] == 'Low') & (other_factors['Density level'] == 'High')]
+                        </p>
+                    </div>
+                    <p>
+                        <center>
+                            <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/12.png" alt="The communes and wards have low real estate cost and high population density" width="75%">
+                            <br><i>Picture 12. The communes and wards have low real estate cost and high population density</i>
+                        </center>
+                    </p>
+                    <p>Opening a coffee shop in Vinh Thanh commune and Phuong Son ward has the advantage of low real estate prices and high population density. However, the density of companies and factories in this area is too low. In addition, Phuong Son ward has a very high level of competition (belonging to Cluster 2), so it is quite risky to do business here.</p>
+                    <li>Low real estate cost - Medium population density (Housing price level low - Density level medium)</li>
+                    <div class="code" style="margin-left: 0px;">
+                        <p>
+                            <i><b># Filter the communes and ward have the low housing price level low and the medium density level.</b></i>
+                            <br>other_factors[(other_factors['Housing price level'] == 'Low') & (other_factors['Density level'] == 'Medium')]
+                        </p>
+                    </div>
+                    <p>
+                        <center>
+                            <img src="../assets/img/opening_a_coffee_shop_in_nha_trang_city/13.png" alt="The communes and wards have low real estate cost and medium population density" width="75%">
+                            <br><i>Picture 13. The communes and wards have low real estate cost and medium population density</i>
+                        </center>
+                    </p>
+                    <p>Vinh Ngoc commune would be the most suitable place to open a store because it has a low level of competition (belonging to Cluster 1), relative population density, real estate prices are higher than in Vinh Thanh commune and Phương Sơn ward insignificantly, while the density of companies and factories is higher than those two areas.</p>
+                </ul>
+            </div>
+            
+            <div class="resume-item">
+                <h3 class="resume-title">Conclusion</h3>
+                <p>The purpose of this project is to find the most suitable commune or ward to open a coffee shop. The main criteria are reasonable fixed costs and economy (specifically real estate costs), high population density, and a large number of companies, factories, and enterprises. Opening a coffee shop is not only for local business but also for factory workers and company employees as these groups tend to buy coffee every morning, gather at the coffee shop during lunch break or after work. After analyzing data from various sources and building a cluster analysis model, the most reasonable commune to open a coffee shop is Vinh Ngoc commune.</p>
+                <p>Additionally, this result is an objective prediction from the data combined with inferences based on the actual situation derived from the data results. Of course, there will be unavoidable shortcomings such as the density of stores not reflecting reality (because the situation of coffee shops sometimes does not exist in Foursquare data, or data from Foursquare is mislabeled, for example, the concept of coffee shop and café can be confusing,…). However, initially, the data collection randomly took places in each commune or ward, if any commune or ward has a high density of coffee shops, naturally, the result will be more, so this issue is also limited.</p>
+            </div>
+            
+            <p style="text-align: right"><i><a href="https://github.com/ntphi15/Customer-Segmentation-by-RMF-Model.git" target="_blank">Click here to see all project</a></i></p>
+        </div>        
+               
+    </section><!-- End About Section -->        
+
+    </main><!-- End #main -->
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="../assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="../assets/vendor/aos/aos.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="../assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="../assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="../assets/vendor/typed.js/typed.umd.js"></script>
+    <script src="../assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="../assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="../assets/js/main.js"></script>
+
+</body>
+
+</html>
